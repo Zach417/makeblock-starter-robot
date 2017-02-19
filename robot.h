@@ -3,21 +3,17 @@
 
 class Robot {
   private:
-    int moveSpeed;
-    MeDCMotor motor;
+    MeDCMotor motorLeft;
+    MeDCMotor motorRight;
     
   public:
-    void forward(MeDCMotor&, int&);
+    int speed;
     void forward();
     void backward();
     void left();
     void right();
-    void backwardAndTurnLeft();
-    void backwardAndTurnRight();
     void stop();
-    void changeSpeed(int speed);
-    void setMotor(MeDCMotor);
-    Robot(MeDCMotor);
+    Robot();
 };
 
 #endif
