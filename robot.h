@@ -3,6 +3,7 @@
 
 class Robot {
   private:
+    MeUltrasonicSensor sensorForward;
     MeDCMotor motorLeft;
     MeDCMotor motorRight;
     
@@ -13,6 +14,7 @@ class Robot {
     void left();
     void right();
     void stop();
+    void drive();
     Robot();
 };
 

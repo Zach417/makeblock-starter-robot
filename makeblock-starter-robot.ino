@@ -2,6 +2,7 @@
 #include <MeOrion.h>
 #include "robot.h"
 
+int type = 0;
 MeInfraredReceiver receiver(PORT_6);
 Robot robot;
 
@@ -11,19 +12,9 @@ int getSpeedFromKey(int i) {
   return factor * i + minSpeed;
 }
 
-void setup() {
-  Serial.begin(115200);
-  
-  robot.stop();
-  receiver.begin();
-  
-  Serial.println("Ready!");
-}
-
-void loop() {
-  receiver.loop();
-  uint8_t irRead = receiver.getCode();
-  switch(irRead)
+void stepManual(uint8_t code) {
+  type = 0;
+  switch(code)
   {
     case IR_BUTTON_PLUS:      robot.forward();                  break;
     case IR_BUTTON_MINUS:     robot.backward();                 break;
@@ -40,4 +31,41 @@ void loop() {
     case IR_BUTTON_1:         robot.speed = getSpeedFromKey(1); break;
     default:                  robot.stop();                     break;
   }
+}
+
+double lastTimeChanged = millis();
+void listenTypeChange(uint8_t code) {
+  double currentTime = millis();
+  double difference = currentTime - lastTimeChanged;
+  if (code == IR_BUTTON_D  && difference > 500) {
+    Serial.println("Change type");
+    if (type == 0) type = 1;
+    else type = 0;
+    lastTimeChanged = millis();
+  }
+}
+
+void stepProgram(uint8_t code) {
+  switch (type) {
+    case 0:
+      stepManual(code);
+      break;
+    case 1:
+      robot.drive();
+      break;
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  robot.stop();
+  receiver.begin();
+  Serial.println("Ready!");
+}
+
+void loop() {
+  receiver.loop();
+  uint8_t code = receiver.getCode();
+  listenTypeChange(code);
+  stepProgram(code);
 }
